@@ -10,13 +10,8 @@ namespace dtp5_contacts_0
         {
             public string persname, surname, phone, address, birthdate;
         }
-        public static Person[] Load(string input, string lastFileName)
+        public static void Load(string lastFileName)
         {
-            if (input.Length < 2)
-            {
-                string[] commandLine;
-                if (input.StartsWith("load ")) { commandLine = new string[] { "load", input.Substring(5) }; lastFileName = commandLine[1]; }
-
                 using (StreamReader infile = new StreamReader(lastFileName))
                 {
                     int i = 0;
@@ -49,8 +44,6 @@ namespace dtp5_contacts_0
                     for (; i < contactList.Length; i++)
                         contactList[i] = null;
                 }
-            }
-            return contactList;
         }
         public static void Main(string[] args)
         {
@@ -80,15 +73,15 @@ namespace dtp5_contacts_0
                             Console.WriteLine("Not yet implemented: safe quit");
                         }
                         break;
-                    case "load":
+                    case "load": // Load -------------------------------------------------
                         if (command.Length > 1)
                             lastFileName = command[1];
                         else
                             lastFileName = "address.lis";
-                        Load(input, lastFileName);
-                        foreach(var p in contactList) { Console.WriteLine(p); }
+                        Load(lastFileName);
+                        //foreach(var p in contactList) { Console.WriteLine(p); }
                         break;
-                    case "save":
+                    case "save": //Save ---------------------------------------------------
                         if (input.Length < 2)
                         {
                             using (StreamWriter outfile = new StreamWriter(lastFileName))
