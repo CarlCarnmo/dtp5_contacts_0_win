@@ -19,7 +19,8 @@ namespace dtp5_contacts_0
 
                 using (StreamReader infile = new StreamReader(lastFileName))
                 {
-                    string line;
+                    int i = 0;
+                    string line = null;
                     while ((line = infile.ReadLine()) != null)
                     {
                         Console.WriteLine(line);
@@ -31,15 +32,22 @@ namespace dtp5_contacts_0
                         p.phone = phones[0];
                         string[] addresses = attrs[3].Split(';');
                         p.address = addresses[0];
-                        for (int ix = 0; ix < contactList.Length; ix++)
+                        for (i = 0; i < contactList.Length; i++)
                         {
-                            if (contactList[ix] == null)
+                            if (contactList[i] == null)
                             {
-                                contactList[ix] = p;
-                                break;
+                                contactList[i] = p;
+                                i++;
+                                if (i >= contactList.Length)
+                                {
+                                    Console.WriteLine($"Address file contains more than {contactList.Length} entries, can't load all of them");
+                                    break;
+                                }
                             }
                         }
                     }
+                    for (; i < contactList.Length; i++)
+                        contactList[i] = null;
                 }
             }
             return contactList;
@@ -62,8 +70,9 @@ namespace dtp5_contacts_0
             {
                 Console.Write($"> ");
                 input = ReadLine();
-                if (input.StartsWith("load ")) { string[] commandLine = new string[] { "load", input.Substring(5) }; }
-                switch (input)
+                string[] command = input.Split(' ', 2);
+                //if (input.StartsWith("load ")) { string[] commandLine = new string[] { "load", input.Substring(5) }; }
+                switch (command[0])
                 {
                     case "quit":
                         {
@@ -72,7 +81,12 @@ namespace dtp5_contacts_0
                         }
                         break;
                     case "load":
+                        if (command.Length > 1)
+                            lastFileName = command[1];
+                        else
+                            lastFileName = "address.lis";
                         Load(input, lastFileName);
+                        foreach(var p in contactList) { Console.WriteLine(p); }
                         break;
                     case "save":
                         if (input.Length < 2)
@@ -123,7 +137,7 @@ namespace dtp5_contacts_0
                         break;
                     default:
                         Console.WriteLine($"Unknown command: '{input}'");
-                        break;
+                        goto case "help";
                 }
             } while (input != "quit"); //C.6
         }
